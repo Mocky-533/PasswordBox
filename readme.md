@@ -16,3 +16,4 @@ On first using, a login password(key) is required. Every time after that, just s
 
 - A GUI (maybe)
 - Optimize searching functions
+- Multiuser

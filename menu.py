@@ -127,6 +127,3 @@ def login():
     pwd = getpass.getpass("[PASSWORD]：") # hide input
     return login_check(pwd)
 
-if __name__ == '__main__':
-    # add_password()
-    search_by_account()

@@ -1,5 +1,6 @@
 import os
 import getpass
+import pyperclip
 from datetime import datetime
 from pwdmanage import (add, search_site, search_account, update_pwd,
      change_login, register_check, register, login_check, delete)
@@ -85,13 +86,21 @@ def display(pwd_result):
     print(84*"#")
     note = f'{len(pwd_result)} password(s) found.'
     print('{:>84}'.format(note))
+    num = input("\nInput a number n to copy the n(th) password to clipboard, letters to ignore: ")
+    if num.isnumeric():
+        pyperclip.copy(pwd_result[int(num)-1][3])
+        print("Password Copied!")
 
 def change_password():
     print('\n' + 16*'#' + ' CHANGE PASSWORD ' + 16*'#' + '\n')
+    verified = False
     success = False
+    while not verified:
+        old_pwd = getpass.getpass('[OLD PASSWORD]: ')
+        verified = login_check(old_pwd)
     while not success:
         new_pwd1 = getpass.getpass('[NEW PASSWORD]: ')
-        new_pwd2 = getpass.getpass('[REPEAT]: ')
+        new_pwd2 = getpass.getpass('[REPEAT NEW PASSWORD]: ')
         if new_pwd1 == new_pwd2:
             success = True
             change_login(new_pwd1)

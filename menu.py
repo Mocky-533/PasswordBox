@@ -12,7 +12,7 @@ def main_menu():
     print('2. Find a password by account or email\n')
     print('3. Find a password by site or app\n')
     print('4. Update stored passwords\n   -> note: First find the stored password and remember its id.')
-    print('5. Delete stored password\n')
+    print('5. Delete stored password\n   -> note: same above.')
     print('6. Change login password\n')
     print('Q. Exit')
     print('-'*30)
@@ -41,7 +41,7 @@ def search_by_account():
         display(pwds)
     else:
         print("Nothing found")
-    input() # display results until "enter" is pressed again
+        input() # display results until "enter" is pressed again
 
 def search_by_site():
     print()
@@ -52,7 +52,7 @@ def search_by_site():
         display(pwds)
     else:
         print("Nothing Found")
-    input()
+        input()
 
 def update():
     print()
@@ -75,15 +75,15 @@ def delete_password():
         delete(id)
 
 def display(pwd_result):
-    print(30*'#' + '  SEARCH RESULT  ' + 37*'#')
-    print(84*'-')
-    print("|{:^3}|{:^15}|{:^15}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
+    print(42*'#' + '  SEARCH RESULT  ' + 50*'#')
+    print(109*'-')
+    print("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
     for pwdinfo in pwd_result:
         date = pwdinfo[4].split(" ") # display only the day this column was added
-        pnt = "|{:^3}|{:^15}|{:^15}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
+        pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
         print(pnt)
-    print(84*'-')
-    print(84*"#")
+    print(109*'-')
+    print(109*"#")
     note = f'{len(pwd_result)} password(s) found.'
     print('{:>84}'.format(note))
     num = input("\nInput a number n to copy the n(th) password to clipboard, letters to ignore: ")

@@ -4,3 +4,4 @@ database.py
 *.db
 __pycache__/
 test.py
+encryption.py

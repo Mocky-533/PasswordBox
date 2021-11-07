@@ -1,5 +1,12 @@
 import sqlite3
 import hashlib
+import re
+
+
+# serach by RE
+def regexp(expr, item):
+    reg = re.compile(expr, re.I) # case-incensitive
+    return reg.search(item) is not None
 
 class DataOp:
     def __init__(self):
@@ -54,12 +61,11 @@ class DataOp:
 
 
     def search_site(self, site: str):
-        name = []
-        name.append(site)
         db = sqlite3.connect("database.db")
+        db.create_function("REGEXP", 2, regexp)
         cur = db.cursor()
-        search = """SELECT * FROM passwd WHERE site=?"""
-        cur.execute(search, tuple(name))
+        search = """SELECT * FROM passwd WHERE site REGEXP ?"""
+        cur.execute(search, [site])
         result = cur.fetchall()
         db.close()
         re = []
@@ -70,12 +76,11 @@ class DataOp:
         return re
 
     def search_account(self, account: str):
-        name = []
-        name.append(account)
         db = sqlite3.connect("database.db")
+        db.create_function("REGEXP", 2, regexp)
         cur = db.cursor()
-        search = """SELECT * FROM passwd WHERE index_ac=?"""
-        cur.execute(search, tuple(name))
+        search = """SELECT * FROM passwd WHERE index_ac REGEXP ?"""
+        cur.execute(search, [account])
         result = cur.fetchall()
         db.close()
         res = []

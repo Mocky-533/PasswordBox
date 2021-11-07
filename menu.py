@@ -31,7 +31,7 @@ class menu():
             now = datetime.now() # time stamp
             time = now.strftime('%Y-%m-%d %H:%M:%S')
             col = []
-            for i in (site, account, pwd_or, time, account.lower()):
+            for i in (site, account, pwd_or, time):
                 col.append(i)
             DataOp().add(col)
 

@@ -21,8 +21,7 @@ class DataOp:
                 site text,
                 account text,
                 password text,
-                date text,
-                index_ac text
+                date text
                 )""")
         except sqlite3.OperationalError:
             pass
@@ -55,7 +54,7 @@ class DataOp:
         info[2] = self.encrypt(info[2], int(info[3][-2:]))
         db = sqlite3.connect("database.db")
         cur = db.cursor()
-        cur.execute(f"""INSERT INTO passwd (site, account, password, date, index_ac) VALUES {tuple(info)}""")
+        cur.execute(f"""INSERT INTO passwd (site, account, password, date) VALUES {tuple(info)}""")
         db.commit()
         db.close()
 
@@ -79,7 +78,7 @@ class DataOp:
         db = sqlite3.connect("database.db")
         db.create_function("REGEXP", 2, regexp)
         cur = db.cursor()
-        search = """SELECT * FROM passwd WHERE index_ac REGEXP ?"""
+        search = """SELECT * FROM passwd WHERE account REGEXP ?"""
         cur.execute(search, [account])
         result = cur.fetchall()
         db.close()
@@ -87,7 +86,7 @@ class DataOp:
         for col in result:
             col = list(col)
             col[3] = self.decrypt(col[3], int(col[4][-2:]))
-            res.append(col[:-1])
+            res.append(col)
         return res
 
     def update_pwd(self, info: list):

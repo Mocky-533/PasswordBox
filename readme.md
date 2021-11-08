@@ -16,6 +16,5 @@ On first launch, a login password(key) is required. Every time after that, just 
 
 ## To do
 
-- A GUI (maybe)
-- Optimize searching functions
-- Multiuser
+- [ ] A GUI (maybe)
+- [x] Optimize searching functions

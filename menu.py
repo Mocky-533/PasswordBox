@@ -25,6 +25,15 @@ class menu():
         print()
         site = input("<Site or App name>: \n")
         account = input("<Account or email>: \n")
+        account_for_dup = "".join(['\\b', account, '\\b'])
+        dup = DataOp().dulplicated(site, account_for_dup)
+        if len(dup) > 0:
+            print("\nPassword(s) of this site using same account exist: ")
+            self.display(dup, 0)
+            op = input('Switch to Update? ["F" to update, otherwise continue adding]: ')
+            if op == 'F' or op == 'f':
+                self.update()
+                return
         pwd_or = input("<Password>: \n")
         check = input("Confirm? [Y to confirm]: ")
         if check == "y" or check == "Y":
@@ -38,10 +47,10 @@ class menu():
     def search_by_account(self):
         print()
         account = input("<Account or email>: \n")
-        pwds = DataOp().search_account(account.lower())
+        pwds = DataOp().search_account(account)
         if len(pwds) > 0:
             print()
-            self.display(pwds)
+            self.display(pwds, 1)
         else:
             print("Nothing found")
             input() # display results until "enter" is pressed again
@@ -49,10 +58,10 @@ class menu():
     def search_by_site(self):
         print()
         site = input("<Site or App>: \n")
-        pwds = DataOp().search_site(site.lower())
+        pwds = DataOp().search_site(site)
         if len(pwds) > 0:
             print()
-            self.display(pwds)
+            self.display(pwds, 1)
         else:
             print("Nothing Found")
             input()
@@ -77,7 +86,7 @@ class menu():
         if check == "y" or check == "Y":
             DataOp().delete(id)
 
-    def display(self, pwd_result):
+    def display(self, pwd_result, flag):
         print(42*'#' + '  SEARCH RESULT  ' + 50*'#')
         print(109*'-')
         print("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
@@ -89,10 +98,12 @@ class menu():
         print(109*"#")
         note = f'{len(pwd_result)} password(s) found.'
         print('{:>84}'.format(note))
-        num = input("\nInput a number n to copy the n(th) password to clipboard, letters to ignore: ")
-        if num.isnumeric():
-            pyperclip.copy(pwd_result[int(num)-1][3])
-            print("Password Copied!")
+        if flag == 1:
+            num = input("\nInput the password ID to copy password, otherwise ignore: ")
+            if num.isnumeric():
+                for pwd in pwd_result:
+                    if int(num) == pwd[0]:
+                        pyperclip.copy(pwd[3])
 
     def change_password(self):
         print('\n' + 16*'#' + ' CHANGE PASSWORD ' + 16*'#' + '\n')

@@ -54,10 +54,25 @@ class DataOp:
         info[2] = self.encrypt(info[2], int(info[3][-2:]))
         db = sqlite3.connect("database.db")
         cur = db.cursor()
-        cur.execute(f"""INSERT INTO passwd (site, account, password, date) VALUES {tuple(info)}""")
+        add_command = """INSERT INTO passwd (site, account, password, date) VALUES ?"""
+        cur.execute(add_command, tuple(info))
         db.commit()
         db.close()
 
+    def dulplicated(self, s: str, a: str):
+        db = sqlite3.connect("database.db")
+        db.create_function("REGEXP", 2, regexp)
+        cur = db.cursor()
+        dup_command = """SELECT * FROM passwd WHERE site=? AND account REGEXP ?"""
+        cur.execute(dup_command, (s, a))
+        result = cur.fetchall()
+        db.close()
+        re = []
+        for col in result:
+            col = list(col)
+            col[3] = self.decrypt(col[3], int(col[4][-2:]))
+            re.append(col)
+        return re
 
     def search_site(self, site: str):
         db = sqlite3.connect("database.db")

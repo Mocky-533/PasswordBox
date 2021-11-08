@@ -27,7 +27,7 @@ if __name__ == "__main__":
             print(f"Wrong password!!!, You have {4-i} chances left.")
     if verified:
         while True:
-            os.system('cls') # clear screen
+            os.system('cls') # clear screen, for windows.
             com = m.main_menu()
             if com == '1':
                 m.add_password()

@@ -54,7 +54,7 @@ class DataOp:
         info[2] = self.encrypt(info[2], int(info[3][-2:]))
         db = sqlite3.connect("database.db")
         cur = db.cursor()
-        add_command = """INSERT INTO passwd (site, account, password, date) VALUES ?"""
+        add_command = """INSERT INTO passwd (site, account, password, date) VALUES (?,?,?,?)"""
         cur.execute(add_command, tuple(info))
         db.commit()
         db.close()

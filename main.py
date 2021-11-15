@@ -2,6 +2,7 @@ import os
 from menu import menu
 
 if __name__ == "__main__":
+    os.system("cls")
     m = menu()
     m.first_login()
     icon = """
@@ -43,4 +44,5 @@ if __name__ == "__main__":
             elif com == '6':
                 m.change_password()
             elif com == 'Q' or com == 'q':
+                os.system("cls")
                 break

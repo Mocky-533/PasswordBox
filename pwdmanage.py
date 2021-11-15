@@ -144,13 +144,10 @@ class DataOp:
         for i in psw:
             ascii_num.append(self.enascii(ord(i), offset + 15))
         encrypted = [chr(a) for a in ascii_num]
-        # print("".join(encrypted))
         return "".join(encrypted)
 
     def decrypt(self, s: str, offset: int) -> str:
-        # encrypted = s.split("|")
         pwd = [chr(self.deascii(ord(a), offset + 15)) for a in s]
-        # print("".join(pwd))
         return "".join(pwd)
 
     def enascii(self, num: int, offset: int) -> int:

@@ -109,17 +109,20 @@ class menu():
         print('\n' + 16*'#' + ' CHANGE PASSWORD ' + 16*'#' + '\n')
         verified = False
         success = False
-        while not verified:
+        for n in range(3):
             old_pwd = getpass.getpass('[OLD PASSWORD]: ')
             verified = DataOp().login_check(old_pwd)
-        while not success:
-            new_pwd1 = getpass.getpass('[NEW PASSWORD]: ')
-            new_pwd2 = getpass.getpass('[REPEAT NEW PASSWORD]: ')
-            if new_pwd1 == new_pwd2:
-                success = True
-                DataOp().change_login(new_pwd1)
+            if verified:
+                while not success:
+                    new_pwd1 = getpass.getpass('[NEW PASSWORD]: ')
+                    new_pwd2 = getpass.getpass('[REPEAT NEW PASSWORD]: ')
+                    if new_pwd1 == new_pwd2:
+                        success = True
+                        DataOp().change_login(new_pwd1)
+                    else:
+                        print("Different Input, Try Again!")
             else:
-                print("Different Input, Try Again!")
+                print(f"Wrong password, {2-n} chances left.")
 
     def first_login(self):
         r = DataOp().register_check()

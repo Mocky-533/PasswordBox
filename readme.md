@@ -23,4 +23,10 @@ On first launch, a login password(key) is required. Every time after that, just 
 
 - [x] ~~A GUI (maybe)~~ Used cursor instead.
 - [x] ~~Optimize searching functions~~ DONE.
-- [ ] use cursers pad to display search result, so that the error of not enough room can be breached.
+- [x] ~~use cursers pad to display search result, so that the error of not enough room can be dodged.~~
+
+## Ending
+
+This repo was just a project to try database operation and python-curses functions.
+
+And this might just be it. Probably I will no longer work on this mini project. Anyone is welcomed to do anything with it, have fun~

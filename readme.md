@@ -17,9 +17,10 @@ On first launch, a login password(key) is required. Every time after that, just 
 
 ## Notification
 
-- Before launching, make sure the terminal running contains at least 30 lines and 100 cols, or the curses package might run into error.
+- Before launching, make sure the terminal running contains at least 30 lines and 110 cols, or the curses package might run into error due to the lack of space on the screen.
 
 ## To do
 
 - [x] ~~A GUI (maybe)~~ Used cursor instead.
 - [x] ~~Optimize searching functions~~ DONE.
+- [ ] use cursers pad to display search result, so that the error of not enough room can be breached.

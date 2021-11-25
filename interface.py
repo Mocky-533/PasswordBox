@@ -62,7 +62,7 @@ def login_interface():
 
     icon_win.addstr(ICON)
     icon_win.refresh()
-    message_win.addstr("\nVerification Required!!!\nYou have 3 chance to input the right password.")
+    message_win.addstr("\nVerification Required!!!\nYou have 3 chance to input the correct password.")
     message_win.addstr("\n" + 16*'#' + ' LOG IN ' + 16*'#')
     icon_win.touchwin()
     message_win.refresh()
@@ -88,8 +88,8 @@ def login_interface():
 def main_menu():
     stdscr = curses.initscr()
     stdscr.clear()
-    display_win = curses.newwin(16, 120, 0, 0)
-    input_win = curses.newwin(13, 120, 16, 0)
+    display_win = curses.newwin(16, 110, 0, 0)
+    input_win = curses.newwin(14, 110, 16, 0)
 
     display_win.addstr(MENU)
     display_win.refresh()
@@ -145,9 +145,7 @@ def add_password():
             update(stdscr)
             return
     stdscr.addstr("<Password>: \n")
-    curses.noecho()
     pwd_or = stdscr.getstr().decode()
-    curses.echo()
     stdscr.addstr("Confirm? ['Y' to confirm]: ")
     check = stdscr.getkey()
     if check == "y" or check == "Y":
@@ -246,24 +244,56 @@ def change_login_key(work_win):
             work_win.addstr(f"Wrong password, {2-n} chances left.")
 
 def display(pwd_result, flag, win):
-    win.addstr(42*'#' + '  SEARCH RESULT  ' + 50*'#' + "\n" + 109*'-' + '\n')
-    win.addstr("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
-    for pwdinfo in pwd_result:
-        date = pwdinfo[4].split(" ")
-        pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
-        win.addstr("\n" + pnt)
-    win.addstr("\n" + 109*'-' + "\n" + 109*"#" + '\n')
-    note = f'{len(pwd_result)} password(s) found.'
-    win.addstr('{:>84}'.format(note))
-    win.refresh()
     if flag == 1:
-        win.addstr("\nInput the password ID to copy password, otherwise ignore: ")
+        length = len(pwd_result)
+        result_pad = curses.newpad(length+7, 110)
+        result_pad.addstr(42*'#' + '  SEARCH RESULT  ' + 50*'#' + "\n" + 109*'-' + '\n')
+        result_pad.addstr("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
+        for pwdinfo in pwd_result:
+            date = pwdinfo[4].split(" ")
+            pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
+            result_pad.addstr("\n" + pnt)
+        result_pad.addstr("\n" + 109*'-' + "\n" + 109*"#" + '\n')
+        note1 = f'{length} password(s) found, press "q" to continue.'
+        result_pad.addstr('{:>84}'.format(note1))
+        win.keypad(True)
+        init_y = 0
+        result_pad.refresh(init_y, 0, 20, 0, 26, 110)    # position here to be filled
+        win.move(12, 0)
+        win.addstr("Use arrow keys to scroll. Don't forget the ID of the password you wanna copy~")
+        while True:
+            curses.noecho()
+            browse = win.getch()
+            if browse == curses.KEY_DOWN:
+                if init_y < length:
+                    init_y += 1
+                    result_pad.refresh(init_y, 0, 20, 0, 26, 110)
+            elif browse == curses.KEY_UP:
+                if init_y > 0:
+                    init_y -= 1
+                    result_pad.refresh(init_y, 0, 20, 0, 26, 110)
+            elif browse == 113:  # 'q' to continue
+                break
+            else:
+                pass
         curses.echo()
+        win.addstr("\nInput the password ID to copy password, otherwise ignore: ")
         num = win.getstr().decode()
         if num.isnumeric():
             for pwd in pwd_result:
                 if int(num) == pwd[0]:
                     pyperclip.copy(pwd[3])
+    else:
+        win.addstr(42*'#' + '  SEARCH RESULT  ' + 50*'#' + "\n" + 109*'-' + '\n')
+        win.addstr("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
+        for pwdinfo in pwd_result:
+            date = pwdinfo[4].split(" ")
+            pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
+            win.addstr("\n" + pnt)
+        win.addstr("\n" + 109*'-' + "\n" + 109*"#" + '\n')
+        note = f'{len(pwd_result)} password(s) found.'
+        win.addstr('{:>84}'.format(note))
+        win.refresh()
 
 
 if __name__ == "__main__":

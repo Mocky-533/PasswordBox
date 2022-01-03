@@ -1,8 +1,11 @@
 import curses
+from hashlib import new
+import random
 from pwdmanage import DataOp
 from datetime import datetime
 import pyperclip
 
+## banner
 ICON = """ *******  **       ** *******     ******     *******   **     **
 /**////**/**      /**/**////**   /*////**   **/////** //**   **
 /**   /**/**   *  /**/**    /**  /*   /**  **     //** //** **
@@ -28,13 +31,15 @@ MENU = """------------------------------
 Q. Exit
 ------------------------------"""
 
+
+## first time using, set a login password
 def first_login_interface():
-    r = DataOp().register_check()
+    r = DataOp().register_check()  #check if a user information exists in the database
     if len(r) == 0:
         stdscr = curses.initscr()
         stdscr.clear()
         icon_win = stdscr.subwin(10, 80, 0, 5)
-        message_win = stdscr.subwin(11, 0)
+        message_win = stdscr.subwin(11, 0)   # split screen to display different contents
         icon_win.addstr(ICON)
         icon_win.refresh()
 
@@ -50,7 +55,7 @@ def first_login_interface():
             login_pwd_or2 = message_win.getstr().decode()
             if login_pwd_or2 == login_pwd_or:
                 success = True
-                DataOp().register(login_pwd_or)
+                DataOp().register(login_pwd_or)  # add login password to database
         curses.endwin()
 
 def login_interface():
@@ -58,15 +63,15 @@ def login_interface():
     stdscr.clear()
     icon_win = stdscr.subwin(10, 80, 0, 5)
     message_win = stdscr.subwin(11, 0)
-    input_win = stdscr.subwin(16, 0)
+    input_win = stdscr.subwin(16, 0)  # split screen
 
     icon_win.addstr(ICON)
-    icon_win.refresh()
+    icon_win.refresh()  # display content
     message_win.addstr("\nVerification Required!!!\nYou have 3 chance to input the correct password.")
     message_win.addstr("\n" + 16*'#' + ' LOG IN ' + 16*'#')
-    icon_win.touchwin()
+    icon_win.touchwin()  # do not refresh certain screen
     message_win.refresh()
-    for i in range(3):
+    for i in range(3):  # three chances to log in
         curses.noecho()
         input_win.addstr("[PASSWORD]: ")
         icon_win.touchwin()
@@ -89,7 +94,7 @@ def main_menu():
     stdscr = curses.initscr()
     stdscr.clear()
     display_win = curses.newwin(16, 110, 0, 0)
-    input_win = curses.newwin(14, 110, 16, 0)
+    input_win = curses.newwin(14, 110, 16, 0)  # split screen
 
     display_win.addstr(MENU)
     display_win.refresh()
@@ -97,7 +102,7 @@ def main_menu():
     input_win.addstr(": ")
     com = input_win.getkey()
     if com == "1":
-        curses.endwin()
+        curses.endwin()  # add password function need a larger window, hence end the current window and start a new one
         add_password()
         return True
     elif com == "2":
@@ -116,7 +121,7 @@ def main_menu():
         change_login_key(input_win)
         return True
     elif com == "q" or com == "Q":
-        input_win.addstr("\nQuit Confirm?")
+        input_win.addstr("\nQuit Confirm?")  # prevent unintended keyboard input
         if input_win.getch() == 10:
             return False
         else:
@@ -124,18 +129,25 @@ def main_menu():
     else:
         return True
 
+def generate(lenth):   # a simple password generating function, to be optimized...
+    new_pwd = ""
+    for _ in range(lenth):
+        asc = random.randint(33, 126)
+        new_pwd += chr(asc)
+    return new_pwd
+
 def add_password():
     stdscr = curses.initscr()
     stdscr.clear()
     curses.echo()
     stdscr.addstr("\n<Site or App name>: \n")
-    site = stdscr.getstr().decode()
+    site = stdscr.getstr().decode()  # convert input to a string variable
     if len(site) == 0:
         return
     stdscr.addstr("<Account or email>: \n")
     account = stdscr.getstr().decode()
-    account_for_dup = "".join(['\\b', account, '\\b'])
-    dup = DataOp().dulplicated(site, account_for_dup)
+    account_for_dup = "".join(['\\b', account, '\\b'])  # check if the same account of the same site has been added
+    dup = DataOp().dulplicated(site, account_for_dup)  # return the items with high similarity
     if len(dup) > 0:
         stdscr.addstr("Password(s) of this site using same account exist: \n")
         display(dup, 0, stdscr)
@@ -144,8 +156,17 @@ def add_password():
         if op == 'F' or op == 'f':
             update(stdscr)
             return
-    stdscr.addstr("<Password>: \n")
-    pwd_or = stdscr.getstr().decode()
+    stdscr.addstr("Generate new password now? ['Y' to generate automatically]: \n")
+    generate_confirm = stdscr.getkey()
+    if generate_confirm == "y" or generate_confirm == "Y":
+        stdscr.addstr("<length of the password>: ")
+        length_demanded = stdscr.getstr().decode()
+        pwd_or = generate(int(length_demanded))
+        pyperclip.copy(pwd_or)
+        stdscr.addstr("[new password has been clipped to clipboard]: \n" + pwd_or + "\n")
+    else:
+        stdscr.addstr("<Password>: \n")
+        pwd_or = stdscr.getstr().decode()
     stdscr.addstr("Confirm? ['Y' to confirm]: ")
     check = stdscr.getkey()
     if check == "y" or check == "Y":
@@ -154,14 +175,14 @@ def add_password():
         col = []
         for i in (site, account, pwd_or, time):
             col.append(i)
-        DataOp().add(col)
+        DataOp().add(col)  # add item to database
 
 def search_by_account(work_win):
     work_win.addstr("\n<Account or email>: \n")
     curses.echo()
     account = work_win.getstr().decode()
     if len(account) == 0:
-        return
+        return  # input nothing to quit searching
     pwds = DataOp().search_account(account)
     if len(pwds) > 0:
         display(pwds, 1, work_win)
@@ -175,7 +196,7 @@ def search_by_site(work_win):
     work_win.addstr("\n<Site or App>: \n")
     site = work_win.getstr().decode()
     if len(site) == 0:
-        return
+        return  # input nothing to quit searching
     pwds = DataOp().search_site(site)
     if len(pwds) > 0:
         display(pwds, 1, work_win)
@@ -191,18 +212,16 @@ def update(work_win):
     if len(id) == 0:
         return
     work_win.addstr("<NEW password>: \n")
-    curses.noecho()
     pwd = work_win.getstr().decode()
     work_win.addstr("Confirm? ['Y' to confirm]: ")
-    curses.echo()
-    check = work_win.getstr().decode()
+    check = work_win.getkey()
     if check == "y" or check == "Y":
         now = datetime.now()
         time = now.strftime('%Y-%m-%d %H:%M:%S')
         col = []
         for i in (pwd, time, id):
             col.append(i)
-        DataOp().update_pwd(col)
+        DataOp().update_pwd(col)  # add modified item to database
 
 def delete_password(work_win):
     work_win.addstr("\n<Password ID>: ")
@@ -211,7 +230,7 @@ def delete_password(work_win):
     if len(id) == 0:
         return
     work_win.addstr("Confirm? ['Y' to confirm]: ")
-    check = work_win.getstr().decode()
+    check = work_win.getkey()
     if check == "y" or check == "Y":
         DataOp().delete(id)
 
@@ -244,7 +263,7 @@ def change_login_key(work_win):
             work_win.addstr(f"Wrong password, {2-n} chances left.")
 
 def display(pwd_result, flag, win):
-    if flag == 1:
+    if flag == 1: # for searching, flag==1, for duplicated item checking, flag==0
         length = len(pwd_result)
         result_pad = curses.newpad(length+7, 110)
         result_pad.addstr(42*'#' + '  SEARCH RESULT  ' + 50*'#' + "\n" + 109*'-' + '\n')
@@ -254,7 +273,7 @@ def display(pwd_result, flag, win):
             pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
             result_pad.addstr("\n" + pnt)
         result_pad.addstr("\n" + 109*'-' + "\n" + 109*"#" + '\n')
-        note1 = f'{length} password(s) found, press "q" to continue.'
+        note1 = f'{length} password(s) found, press "q" to continue.'  # need a better way to skip back to input window
         result_pad.addstr('{:>84}'.format(note1))
         win.keypad(True)
         init_y = 0

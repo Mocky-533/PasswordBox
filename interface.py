@@ -156,16 +156,19 @@ def add_password():
         if op == 'F' or op == 'f':
             update(stdscr)
             return
-    stdscr.addstr("Generate new password now? ['Y' to generate automatically]: \n")
+    stdscr.addstr("Generate new password now? ['Y' to generate automatically]: ")
     generate_confirm = stdscr.getkey()
+    generate_status = False
     if generate_confirm == "y" or generate_confirm == "Y":
         stdscr.addstr("<length of the password>: ")
         length_demanded = stdscr.getstr().decode()
-        pwd_or = generate(int(length_demanded))
-        pyperclip.copy(pwd_or)
-        stdscr.addstr("[new password has been clipped to clipboard]: \n" + pwd_or + "\n")
-    else:
-        stdscr.addstr("<Password>: \n")
+        if length_demanded.isnumeric():
+            generate_status = True
+            pwd_or = generate(int(length_demanded))
+            pyperclip.copy(pwd_or)
+            stdscr.addstr("[new password has been clipped to clipboard]: \n" + pwd_or + "\n")
+    if generate_status == False:
+        stdscr.addstr("\n<Password>: \n")
         pwd_or = stdscr.getstr().decode()
     stdscr.addstr("Confirm? ['Y' to confirm]: ")
     check = stdscr.getkey()

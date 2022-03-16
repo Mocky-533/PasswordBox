@@ -67,7 +67,7 @@ def login_interface():
 
     icon_win.addstr(ICON)
     icon_win.refresh()  # display content
-    message_win.addstr("\nVerification Required!!!\nYou have 3 chance to input the correct password.")
+    message_win.addstr("\nVerification Required!!!\nYou have 3 chances to input the correct password.")
     message_win.addstr("\n" + 16*'#' + ' LOG IN ' + 16*'#')
     icon_win.touchwin()  # do not refresh certain screen
     message_win.refresh()
@@ -140,6 +140,7 @@ def add_password():
     stdscr = curses.initscr()
     stdscr.clear()
     curses.echo()
+    stdscr.addstr("\n{:#^49}".format(" ADD PASSWORD "))
     stdscr.addstr("\n<Site or App name>: \n")
     site = stdscr.getstr().decode()  # convert input to a string variable
     if len(site) == 0:
@@ -181,6 +182,7 @@ def add_password():
         DataOp().add(col)  # add item to database
 
 def search_by_account(work_win):
+    work_win.addstr("\n{:#^49}".format(" SEARCH BY ACCOUNT "))
     work_win.addstr("\n<Account or email>: \n")
     curses.echo()
     account = work_win.getstr().decode()
@@ -196,6 +198,8 @@ def search_by_account(work_win):
 
 def search_by_site(work_win):
     curses.echo()
+    work_win.addstr("\n{:#^49}".format(" SEARCH BY SITE "))
+
     work_win.addstr("\n<Site or App>: \n")
     site = work_win.getstr().decode()
     if len(site) == 0:
@@ -210,6 +214,7 @@ def search_by_site(work_win):
 
 def update(work_win):
     curses.echo()
+    work_win.addstr("\n{:#^49}".format(" UPDATE PASSWORD "))
     work_win.addstr("\n<Password ID>: \n")
     id = work_win.getstr().decode()
     if len(id) == 0:
@@ -227,22 +232,29 @@ def update(work_win):
         DataOp().update_pwd(col)  # add modified item to database
 
 def delete_password(work_win):
+    work_win.addstr("\n{:#^49}".format(" DELETE PASSWORD "))
     work_win.addstr("\n<Password ID>: ")
     curses.echo()
     id = work_win.getstr().decode()
     if len(id) == 0:
         return
-    work_win.addstr("Confirm? ['Y' to confirm]: ")
-    check = work_win.getkey()
-    if check == "y" or check == "Y":
-        DataOp().delete(id)
+    pwds = DataOp().search_id(id)
+    if len(pwds) > 0:
+        display(pwds, 0, work_win)
+        work_win.addstr("Confirm? ['Y' to confirm]: ")
+        check = work_win.getkey()
+        if check == "y" or check == "Y":
+            DataOp().delete(id)
+    else:
+        work_win.addstr("Nothing found.")
+        work_win.getkey()
 
 def change_login_key(work_win):
-    work_win.addstr('\n' + 16*'#' + ' CHANGE PASSWORD ' + 16*'#' + '\n')
+    work_win.addstr("\n{:#^49}".format(" CHAGNE LOGIN KEY "))
     verified = False
     success = False
     for n in range(3):
-        work_win.addstr("[OLD PASSWORD]: ")
+        work_win.addstr("\n[OLD PASSWORD]: ")
         curses.noecho()
         old_pwd = work_win.getstr().decode()
         verified = DataOp().login_check(old_pwd)
@@ -262,18 +274,18 @@ def change_login_key(work_win):
                     work_win.addstr("Different input, try again!")
         else:
             work_win.clear()
-            work_win.addstr(16*'#' + ' CHANGE PASSWORD ' + 16*'#' + '\n')
-            work_win.addstr(f"Wrong password, {2-n} chances left.")
+            work_win.addstr(": \n" + 16*'#' + ' CHANGE PASSWORD ' + 16*'#' + '\n')
+            work_win.addstr(f"Wrong password, {2-n} chance(s) left.")
 
 def display(pwd_result, flag, win):
     if flag == 1: # for searching, flag==1, for duplicated item checking, flag==0
         length = len(pwd_result)
         result_pad = curses.newpad(length+7, 110)
         result_pad.addstr(42*'#' + '  SEARCH RESULT  ' + 50*'#' + "\n" + 109*'-' + '\n')
-        result_pad.addstr("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
+        result_pad.addstr("|{:^3}|{:^20}|{:^35}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
         for pwdinfo in pwd_result:
             date = pwdinfo[4].split(" ")
-            pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
+            pnt = "|{:^3}|{:^20}|{:^35}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
             result_pad.addstr("\n" + pnt)
         result_pad.addstr("\n" + 109*'-' + "\n" + 109*"#" + '\n')
         note1 = f'{length} password(s) found, press "q" to continue.'  # need a better way to skip back to input window
@@ -307,13 +319,13 @@ def display(pwd_result, flag, win):
                     pyperclip.copy(pwd[3])
     else:
         win.addstr(42*'#' + '  SEARCH RESULT  ' + 50*'#' + "\n" + 109*'-' + '\n')
-        win.addstr("|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
+        win.addstr("|{:^3}|{:^20}|{:^35}|{:^30}|{:^15}|".format('ID', 'SITE', 'ACCOUNT', 'PASSWORD', 'DATE'))
         for pwdinfo in pwd_result:
             date = pwdinfo[4].split(" ")
-            pnt = "|{:^3}|{:^15}|{:^40}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
+            pnt = "|{:^3}|{:^20}|{:^35}|{:^30}|{:^15}|".format(pwdinfo[0], pwdinfo[1], pwdinfo[2], pwdinfo[3], date[0])
             win.addstr("\n" + pnt)
         win.addstr("\n" + 109*'-' + "\n" + 109*"#" + '\n')
-        note = f'{len(pwd_result)} password(s) found.'
+        note = f'{len(pwd_result)} password(s) found.\n'
         win.addstr('{:>84}'.format(note))
         win.refresh()
 

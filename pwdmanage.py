@@ -104,6 +104,20 @@ class DataOp:
             res.append(col)
         return res
 
+    def search_id(self, id: int):
+        db = sqlite3.connect("database.db")
+        cur = db.cursor()
+        search = """SELECT * FROM passwd WHERE id=?"""
+        cur.execute(search, [id])
+        result = cur.fetchall()
+        db.close()
+        res = []
+        for col in result:
+            col = list(col)
+            col[3] = self.decrypt(col[3], int(col[4][-2:]))
+            res.append(col)
+        return res
+
     def update_pwd(self, info: list):
         info[0] = self.encrypt(info[0], int(info[1][-2:]))
         db = sqlite3.connect("database.db")

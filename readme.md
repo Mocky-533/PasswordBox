@@ -15,6 +15,16 @@ On first launch, a login password(key) is required. Every time after that, just 
 5. change login password(key)
     - add verification before changing login key. (v1.01)
 
+## Usage
+
+1. Install requirements
+
+    `pip install -r requirements.txt`
+
+2. Launch it
+
+    `python interface.py`
+
 ## Notification
 
 - Before launching, make sure the terminal running contains at least 30 lines and 110 cols, or the curses package might run into error due to the lack of space on the screen.

@@ -1,5 +1,4 @@
 import curses
-from hashlib import new
 import random
 from pwdmanage import DataOp
 from datetime import datetime
@@ -219,17 +218,22 @@ def update(work_win):
     id = work_win.getstr().decode()
     if len(id) == 0:
         return
-    work_win.addstr("<NEW password>: \n")
-    pwd = work_win.getstr().decode()
-    work_win.addstr("Confirm? ['Y' to confirm]: ")
-    check = work_win.getkey()
-    if check == "y" or check == "Y":
-        now = datetime.now()
-        time = now.strftime('%Y-%m-%d %H:%M:%S')
-        col = []
-        for i in (pwd, time, id):
-            col.append(i)
-        DataOp().update_pwd(col)  # add modified item to database
+    pwds = DataOp().search_id(id)
+    if len(pwds) > 0:
+        display(pwds, 0, work_win)
+        work_win.addstr("<NEW password>: \n")
+        pwd = work_win.getstr().decode()
+        if len(pwd) == 0:
+            return
+        work_win.addstr("Confirm? ['Y' to confirm]: ")
+        check = work_win.getkey()
+        if check == "y" or check == "Y":
+            now = datetime.now()
+            time = now.strftime('%Y-%m-%d %H:%M:%S')
+            col = []
+            for i in (pwd, time, id):
+                col.append(i)
+            DataOp().update_pwd(col)  # add modified item to database
 
 def delete_password(work_win):
     work_win.addstr("\n{:#^49}".format(" DELETE PASSWORD "))

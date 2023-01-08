@@ -1,0 +1,7 @@
+psw/
+.vscode/
+database.py
+*.db
+__pycache__/
+test.*
+encryption.py

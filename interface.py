@@ -298,7 +298,7 @@ def display(pwd_result, flag, win):
         init_y = 0
         result_pad.refresh(init_y, 0, 20, 0, 26, 110)    # position here to be filled
         win.move(12, 0)
-        win.addstr("Use arrow keys to scroll. Don't forget the ID of the password you wanna copy~")
+        win.addstr("Use vim keybindings to scroll. Don't forget the ID of the password you wanna copy~")
         while True:
             curses.noecho()
             browse = win.getkey()

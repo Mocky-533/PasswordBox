@@ -119,10 +119,10 @@ class DataOp:
         return res
 
     def update_pwd(self, info: list):
-        info[0] = self.encrypt(info[0], int(info[1][-2:]))
+        info[1] = self.encrypt(info[1], int(info[2][-2:]))
         db = sqlite3.connect("database.db")
         cur = db.cursor()
-        update_command = """UPDATE passwd SET password=?, date=? WHERE id=?"""
+        update_command = """UPDATE passwd SET account=?, password=?, date=? WHERE id=?"""
         cur.execute(update_command, tuple(info))
         db.commit()
         db.close()

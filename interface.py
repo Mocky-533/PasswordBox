@@ -111,7 +111,8 @@ def main_menu():
         search_by_site(input_win)
         return True
     elif com == "4":
-        update(input_win)
+        curses.endwin() # update password function need a larger window, hence end the current window and start a new one
+        update()
         return True
     elif com == "5":
         delete_password(input_win)
@@ -211,7 +212,9 @@ def search_by_site(work_win):
         work_win.addstr("Nothing found.")
         work_win.getkey()
 
-def update(work_win):
+def update():
+    work_win = curses.initscr()
+    work_win.clear()
     curses.echo()
     work_win.addstr("\n{:#^49}".format(" UPDATE PASSWORD "))
     work_win.addstr("\n<Password ID>: \n")
@@ -221,17 +224,21 @@ def update(work_win):
     pwds = DataOp().search_id(id)
     if len(pwds) > 0:
         display(pwds, 0, work_win)
-        work_win.addstr("<NEW password>: \n")
+        work_win.addstr("<NEW account>: (input nothing to not change) \n")
+        account = work_win.getstr().decode()
+        if len(account) == 0:
+            account = pwds[0][2]
+        work_win.addstr("<NEW password>: (input nothing to not change) \n")
         pwd = work_win.getstr().decode()
         if len(pwd) == 0:
-            return
+            pwd = pwds[0][3]
         work_win.addstr("Confirm? ['Y' to confirm]: ")
         check = work_win.getkey()
         if check == "y" or check == "Y":
             now = datetime.now()
             time = now.strftime('%Y-%m-%d %H:%M:%S')
             col = []
-            for i in (pwd, time, id):
+            for i in (account, pwd, time, id):
                 col.append(i)
             DataOp().update_pwd(col)  # add modified item to database
 
